@@ -4,58 +4,59 @@ void	my_put_pixel(t_data *img, int x, int y, int color)
 {
 	char	*dst;
 
+	if (x < 0 || x >= 1000 || y < 0 || y >= 1000)
+		return ;
 	dst = img->add + y * img->line_length + x * img->bits_per_pixel / 8;
 	*((unsigned int *)dst) = color;
 }
 
-// double	ft_abs(double d)
-// {
-// 	if (d < 0)
-// 		d *= -1;
-// 	return (d);
-// }
+void	handle_no_event()
+{
+	return ;
+}
 
 void	iterate_set(t_fractal *frac, t_data *img, double Px, double Py)
 {
 	int		i;
 	double	tmp;
+	int		color;
+	int		i_limit;
 
 	i = 0;
+	i_limit = 200;
 	frac->Zre = frac->Cx;
 	frac->Zim = frac->Cy;
-	while (i < 10000 && fabs(frac->Zre) <= 2 && fabs(frac->Zim) <= 2)
+	while (i < i_limit && (frac->Zre * frac->Zre + frac->Zim * frac->Zim) <= 4)
 	{
-		// printf("Zre: %f\n", frac->Zre);
-		// printf("Zim: %f\n", frac->Zim);
 		tmp = frac->Zre;
-		frac->Zre = pow(frac->Zre, 2) - pow(frac->Zim, 2) + frac->Cx;
+		frac->Zre = (frac->Zre * frac->Zre) - (frac->Zim * frac->Zim) + frac->Cx;
 		frac->Zim = tmp * frac->Zim * 2 + frac->Cy;
 		i++;
 	}
-	// printf("Zre: %f\n", frac->Zre);
-	// printf("Zim: %f\n", frac->Zim);
-	if (fabs(frac->Zre) <= 2 && fabs(frac->Zim) <= 2)
-		my_put_pixel(img, Px, Py, 0x000000FF);
+	if (i == i_limit)
+			color = 0x00000000;
 	else
-		my_put_pixel(img, Px, Py, 0x00000000);
+		color = (i * 15) << 16 | (i * 15) << 8 | (i * 3);
+	my_put_pixel(img, Px, Py, color);
 }
 
-void	print_mandelbrot_to_window(t_fractal *frac, t_data *img)
+void	print_mandelbrot_to_window(t_fractal *frac, t_data *img, double zoom)
 {
 	double	Px;
 	double	Py;
-	// int	iter_ret;
 
 	Py = 0;
-	while ((int)Py <= (int)frac->height)
+	while ((int)Py < (int)frac->height)
 	{
 		Px = 0;
-		while ((int)Px <= (int)frac->width)
+		while ((int)Px < (int)frac->width)
 		{
-			frac->Cx = (Px * (double)4 / (double)frac->width) - (double)2;
-			frac->Cy = (Py * (double)4 / (double)frac->height) - (double)2;
-			printf("Cx: %f\n", frac->Cx);
-			printf("Cy: %f\n", frac->Cy);
+			// why does it not stop at Px \ Py = 999 since it starts from 0?
+			// why does it not overflow or segfault when surpassing Px \ Py = 999?
+			frac->Cx = (Px * ((double)4 / (double)zoom) / (double)(frac->width - 1)) - ((double)3 / (double)zoom);
+			frac->Cy = (Py * ((double)4 / (double)zoom) / (double)(frac->height - 1)) - ((double)-3 / (double)zoom);
+			// frac->Cx = ((Px * (double)4 / (double)frac->width) - (double)2) / (double)zoom;
+			// frac->Cy = ((Py * (double)4 / (double)frac->height) - (double)2) / (double)zoom;
 			iterate_set(frac, img, Px, Py);
 			Px++;
 		}
@@ -63,41 +64,40 @@ void	print_mandelbrot_to_window(t_fractal *frac, t_data *img)
 	}
 }
 
+int	zoom_effect(void *param)
+{
+	t_vars	*vars;
+
+	vars = (t_vars *)param;
+	vars->zoom *= 1.005;
+	print_mandelbrot_to_window(vars->frac, vars->img, vars->zoom);
+	mlx_put_image_to_window(vars->frac->mlx_ptr, vars->frac->window, vars->img->img, 0, 0);
+	if (vars->zoom >= 10)
+		exit(0);
+	return (0);
+}
+
 int	mlx_play_around()
 {
-	void	*mlx_ptr;
-	void	*window;
 	t_data		img;
 	t_fractal	frac;
+	t_vars		vars;
 
-	frac.height = 1080;
-	frac.width = 1080;
-	mlx_ptr = (void *)mlx_init();
-//	if (!mlx_ptr)
-//	return (1);
-	window = mlx_new_window(mlx_ptr, frac.width, frac.height, "Playing around");
-	//	if (!window)
-//	return (1);
-	img.img = mlx_new_image(mlx_ptr, frac.width, frac.height);
-//	if (img.img == NULL)
-//	{
-//	mlx_destroy_window(mlx_ptr, window);
-	// return (1);
-	// }
+	frac.height = 500;
+	frac.width = 500;
+	frac.mlx_ptr = (void *)mlx_init();
+	frac.window = mlx_new_window(frac.mlx_ptr, frac.width, frac.height, "Playing around");
+	img.img = mlx_new_image(frac.mlx_ptr, frac.width, frac.height);
 	img.add = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-//	if (img.add == NULL)
-//	{
-//	mlx_destroy_window(img.img, window);
-	//	mlx_destroy_window(mlx_ptr, window);
-	//	free(img.img);
-	//	return (1);
-	//	}
 	frac.Zre = 0;
 	frac.Zim = 0;
-	print_mandelbrot_to_window(&frac, &img);
-	// fill_image_pattern(&img);
-	mlx_put_image_to_window(mlx_ptr, window, img.img, 0, 0);
-	mlx_loop(mlx_ptr);
+	vars.img = &img;
+	vars.frac = &frac;
+	vars.zoom = 1;
+	print_mandelbrot_to_window(&frac, &img, vars.zoom);
+	mlx_put_image_to_window(frac.mlx_ptr, frac.window, img.img, 0, 0);
+	mlx_loop_hook(frac.mlx_ptr, zoom_effect, &vars);
+	mlx_loop(frac.mlx_ptr);
 	return (0);
 }
 

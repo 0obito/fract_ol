@@ -2,7 +2,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 MLXFLAGS = -lmlx -lXext -lX11 -lm
 NAME = fractol
-SRC = minilibx.c main.c
+SRC = main.c
 OBJ = $(SRC:.c=.o)
 
 $(NAME): $(OBJ)
