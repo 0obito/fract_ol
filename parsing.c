@@ -12,16 +12,18 @@
 
 #include "main.h"
 
-void	print_error_and_exit(void)
+void	print_message_and_exit(void)
 {
-	write(1, "There's been some error!\n", 25);
-/*	write(1, "Wrong input. Here are the valid arguuments you can use:\n", 52);
-	write(1, "Mandelbrot:\t`./fractol Mandelbrot`\n", 35);
-	write(1, "Julia\t`./fractol Julia`\n", 24);*/
+	write(1, "Usage: ./fract-ol [Set_Name] [X] [Y]\n", 37);
+	write(1, "Set_Name: 'Mandelbrot' or 'Julia' (required)\n", 45);
+	write(1, "X and Y: Only for 'Julia' (optional, defaults will be used if not provided)\n", 76);
+	write(1, "Example:\n", 9);
+	write(1, "  ./fract-ol Mandelbrot\n", 24);
+	write(1, "  ./fract-ol Julia 0.285 0.01\n", 30);
 	exit(1);
 }
 
-int	ft_strcmp(char *s1, char *s2)
+static int	ft_strcmp(char *s1, char *s2)
 {
 	if (!s1 || !s2)
 		return (1);
@@ -35,25 +37,32 @@ int	ft_strcmp(char *s1, char *s2)
 	return (0);
 }
 
-int	handle_parsing(int ac, char *av[])
+void	handle_parsing(int ac, char *av[], t_fractal *frac)
 {
-	double	julia_x_input;
-	double	julia_y_input;
-
 	if (ac == 2 && (ft_strcmp("Mandelbrot", av[1]) == 0
 			|| ft_strcmp("mandelbrot", av[1]) == 0))
-		generate_fractal(0, JULIA_X, JULIA_Y);
+	{
+		frac->mandelbrot = 1;
+		frac->julia = 0;
+		frac->julia_x = 0;
+		frac->julia_y = 0;
+	}
 	else if (ac == 2 && (ft_strcmp("Julia", av[1]) == 0
 			|| ft_strcmp("julia", av[1]) == 0))
-		generate_fractal(1, JULIA_X, JULIA_Y);
+	{
+		frac->mandelbrot = 0;
+		frac->julia = 1;
+		frac->julia_x = -0.79;
+		frac->julia_y = 0.15;
+	}
 	else if (ac == 4 && (ft_strcmp("Julia", av[1]) == 0
 			|| ft_strcmp("julia", av[1]) == 0))
 	{
-		julia_x_input = ft_atod(av[2]);
-		julia_y_input = ft_atod(av[3]);
-		generate_fractal(1, julia_x_input, julia_y_input);
+		frac->mandelbrot = 0;
+		frac->julia = 1;
+		frac->julia_x = ft_atod(av[2]);
+		frac->julia_y = ft_atod(av[3]);
 	}
 	else
-		print_error_and_exit();
-	return (0);
+		print_message_and_exit();
 }

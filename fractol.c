@@ -14,6 +14,17 @@
 
 int	main(int ac, char *av[])
 {
-	handle_parsing(ac, av);
+	t_mlx		mlx;
+	t_data		data;
+	t_fractal	frac;
+	t_vars		vars;
+
+	handle_parsing(ac, av, &frac);
+	init_structs(&mlx, &data, &frac, &vars);
+	generate_fractal(&vars);
+	mlx_hook(mlx.win_ptr, 17, 0, close_program, &vars);
+	mlx_key_hook(mlx.win_ptr, key_hook, &vars);
+	mlx_mouse_hook(mlx.win_ptr, mouse_hook, &vars);
+	mlx_loop(mlx.mlx_ptr);
 	return (0);
 }

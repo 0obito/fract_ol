@@ -14,21 +14,14 @@
 # define MAIN_H
 
 # include <stdlib.h>
-# include <stdio.h>
 # include <unistd.h>
 # include <mlx.h>
-# include <math.h>
+# include <X11/keysym.h>
 
-# define IMAGE_WIDTH 800
-# define IMAGE_HEIGHT 800
-
-# define COMPLEX_WIDTH 4
-# define COMPLEX_HEIGHT 4
-
-# define ITERATIONS_LIMIT 10000
-
-# define JULIA_X 0.355534
-# define JULIA_Y -0.337292
+# define IMG_WID 1000
+# define IMG_HEI 1000
+# define C_WID 4
+# define C_HEI 4
 
 typedef struct s_data
 {
@@ -42,15 +35,24 @@ typedef struct s_data
 typedef struct s_mlx
 {
 	void	*mlx_ptr;
-	void	*window;
+	void	*win_ptr;
 }				t_mlx;
 
 typedef struct s_fractal
 {
+	int		julia;
+	int		mandelbrot;
 	double	c_x;
 	double	c_y;
 	double	z_re;
 	double	z_im;
+	double	julia_x;
+	double	julia_y;
+	int		iterations;
+	double	shift_x;
+	double	shift_y;
+	double	render;
+	// double	color_param;
 	double	zoom;
 }				t_fractal;
 
@@ -62,9 +64,13 @@ typedef struct s_vars
 }				t_vars;
 
 void	init_structs(t_mlx *mlx, t_data *data, t_fractal *frac, t_vars *vars);
-int	handle_parsing(int ac, char *av[]);
-int	generate_fractal(int bin, double julia_x, double julia_y);
+void	handle_parsing(int ac, char *av[], t_fractal *frac);
 double	ft_atod(char *s);
-void	print_error_and_exit(void);
+void	print_message_and_exit(void);
+int		generate_fractal(t_vars *vars);
+void	set_z_and_c(int px, int py, t_vars *vars);
+int		close_program(t_vars *vars);
+int		key_hook(int keycode, t_vars *vars);
+int		mouse_hook(int keycode, int x, int y, t_vars *vars);
 
 #endif /* MAIN_H */

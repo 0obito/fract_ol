@@ -49,18 +49,16 @@ double	ft_atod(char *s)
 		if (*(s++) == '-')
 			sign = -1;
 	if (*s < '0' || *s > '9')
-		print_error_and_exit();
+		print_message_and_exit();
 	while (*s >= '0' && *s <= '9')
 	{
 		res = res * 10 + (*s - '0');
-		if (res > (double)2)
-			print_error_and_exit();
 		s++;
 	}
 	if (*s == '.')
 		res += ft_atod_fraction(&s);
 	skip_spaces(&s);
 	if (*s)
-		print_error_and_exit();
+		print_message_and_exit();
 	return (res * sign);
 }
