@@ -84,7 +84,7 @@ static void	fill_image(t_vars *vars)
 			{
 				vars->frac->c_x = ((double)px * C_WID / (IMG_WID - 1) - (C_WID
 							/ 2)) / vars->frac->zoom + vars->frac->shift_x;
-				vars->frac->c_y = -1 * ((double)py * C_HEI / (IMG_HEI - 1) - (C_HEI
+				vars->frac->c_y = ((double)-py * C_HEI / (IMG_HEI - 1) - (C_HEI
 							/ 2)) / vars->frac->zoom + vars->frac->shift_y;
 			}
 			fill_pixel(px, py, vars);

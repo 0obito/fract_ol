@@ -14,12 +14,13 @@
 
 void	print_message_and_exit(void)
 {
-	write(1, "Usage: ./fract-ol [Set_Name] [X] [Y]\n", 37);
-	write(1, "Set_Name: 'Mandelbrot' or 'Julia' (required)\n", 45);
-	write(1, "X and Y: Only for 'Julia' (optional, defaults will be used if not provided)\n", 76);
-	write(1, "Example:\n", 9);
-	write(1, "  ./fract-ol Mandelbrot\n", 24);
-	write(1, "  ./fract-ol Julia 0.285 0.01\n", 30);
+	write(1, "\n\033[1;31mError:\033[0m Invalid arguments!\n", 38);
+	write(1, "\n\033[1;34mUsage:\033[0m ./fractol [Set_Name] [X] [Y]\n", 48);
+	write(1, "\n\033[1;32mSet_Name:\033[0m 'Mandelbrot' or 'Julia'\n", 46);
+	write(1, "\033[1;32mX and Y:\033[0m Only for 'Julia' (optional)\n", 48);
+	write(1, "\n\033[1;34mExamples:\033[0m\n", 22);
+	write(1, "  ➤ ./fractol Mandelbrot\n", 27);
+	write(1, "  ➤ ./fractol Julia 0.285 0.01\n\n", 34);
 	exit(1);
 }
 
@@ -47,21 +48,19 @@ void	handle_parsing(int ac, char *av[], t_fractal *frac)
 		frac->julia_x = 0;
 		frac->julia_y = 0;
 	}
-	else if (ac == 2 && (ft_strcmp("Julia", av[1]) == 0
-			|| ft_strcmp("julia", av[1]) == 0))
+	else if ((ft_strcmp("Julia", av[1]) == 0
+			|| ft_strcmp("julia", av[1]) == 0)
+		&& (ac == 2 || ac == 4))
 	{
 		frac->mandelbrot = 0;
 		frac->julia = 1;
 		frac->julia_x = -0.79;
 		frac->julia_y = 0.15;
-	}
-	else if (ac == 4 && (ft_strcmp("Julia", av[1]) == 0
-			|| ft_strcmp("julia", av[1]) == 0))
-	{
-		frac->mandelbrot = 0;
-		frac->julia = 1;
-		frac->julia_x = ft_atod(av[2]);
-		frac->julia_y = ft_atod(av[3]);
+		if (ac == 4)
+		{
+			frac->julia_x = ft_atod(av[2]);
+			frac->julia_y = ft_atod(av[3]);
+		}
 	}
 	else
 		print_message_and_exit();

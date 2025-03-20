@@ -54,16 +54,6 @@ int	key_hook(int keycode, t_vars *vars)
 		vars->frac->shift_x = 0;
 		vars->frac->shift_y = 0;
 	}
-	else if (keycode == XK_F1)
-	{
-		vars->frac->shift_x *= 0.9;
-		vars->frac->render = 0;
-	}
-	else if (keycode == XK_F2)
-	{
-		vars->frac->shift_x *= 1.1;
-		vars->frac->render = 0;
-	}
 	else
 		vars->frac->render = 0;
 	if (vars->frac->render == 1)
